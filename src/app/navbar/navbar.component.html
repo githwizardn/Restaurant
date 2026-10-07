@@ -1,0 +1,45 @@
+<header class="navbar" [class.is-transparent]="isTransparentBg">
+  <a class="brand" href="#home" (click)="navigate($event, '#home')" aria-label="Burger Lions — მთავარი">
+    <span class="brand-mark">BL</span>
+    <span class="brand-name">Burger&nbsp;Lions</span>
+  </a>
+
+  <button
+    type="button"
+    class="menu-toggle"
+    *ngIf="isSmallScreen"
+    (click)="toggleMobileMenu()"
+    [attr.aria-expanded]="mobileMenuOpen"
+    aria-label="მენიუს გახსნა"
+  >
+    <i class="fa-solid" [class.fa-bars]="!mobileMenuOpen" [class.fa-xmark]="mobileMenuOpen" aria-hidden="true"></i>
+  </button>
+
+  <nav *ngIf="!isSmallScreen" aria-label="მთავარი ნავიგაცია">
+    <ul class="menu">
+      <li *ngFor="let item of menuItems">
+        <a
+          [href]="item.link"
+          [class.active]="activeSection === item.sectionId"
+          (click)="navigate($event, item.link)"
+        >
+          {{ item.label }}
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<div class="mobile-menu" *ngIf="isSmallScreen && mobileMenuOpen">
+  <ul class="menu mobile">
+    <li *ngFor="let item of menuItems">
+      <a
+        [href]="item.link"
+        [class.active]="activeSection === item.sectionId"
+        (click)="navigate($event, item.link)"
+      >
+        {{ item.label }}
+      </a>
+    </li>
+  </ul>
+</div>

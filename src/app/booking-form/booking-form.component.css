@@ -1,0 +1,108 @@
+.wrapp-booking-form {
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.booking-form {
+  flex: 1 1 60%;
+}
+
+.working-hours {
+  flex: 1 1 35%;
+  background: #111;
+  padding: 30px;
+  border-radius: 4px;
+}
+
+.working-hours h3 {
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+
+.working-hours > p {
+  color: var(--color-text-muted);
+  margin-bottom: 24px;
+}
+
+.hours-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.wrapp-input-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.field label {
+  display: block;
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: 8px;
+}
+
+.field input {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 15px;
+  transition: border-color 0.2s ease;
+}
+
+.field input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.field input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.error {
+  display: block;
+  color: var(--color-error);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.submit-btn {
+  margin-top: 20px;
+  min-width: 200px;
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.result {
+  margin-top: 16px;
+  font-size: 15px;
+}
+
+.result.success { color: var(--color-success); }
+.result.error { color: var(--color-error); }
+
+@media (max-width: 992px) {
+  .wrapp-booking-form { flex-direction: column; }
+  .booking-form, .working-hours { flex: 1 1 100%; width: 100%; }
+}
+
+@media (max-width: 600px) {
+  .wrapp-input-group { grid-template-columns: 1fr; }
+}

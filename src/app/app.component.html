@@ -1,0 +1,90 @@
+<navbar></navbar>
+
+<main>
+    <section id="home" class="flex-row">
+    <div class="wrapper home-content">
+      <div>
+        <p class="eyebrow">Burger Lions · ვარკეთილი</p>
+        <h1>ნამდვილი ბურგერები ლომის გემოთი</h1>
+        <p>
+          ხელნაკეთი პური, ახალი ხორცი, ყოველდღე მოჭრილი ბოსტნეული. Burger Lions —
+          ადგილი, სადაც ბურგერი ხელოვნებაა.
+        </p>
+        <button class="btn" type="button" (click)="scrollToBookingTable()">
+          შეუკვეთე მაგიდა
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section id="special-dishes">
+    <div class="title-center">
+      <h2>ჩვენი ჰიტები</h2>
+      <p>საუკეთესო ბურგერები, რომლებიც ჩვენი სტუმრების ფავორიტებად იქცნენ.</p>
+    </div>
+    <div class="wrapper">
+      <card-carousel></card-carousel>
+    </div>
+  </section>
+
+  <section id="about-us">
+    <about></about>
+  </section>
+
+    <section id="offer">
+    <div class="wrapper">
+      <h2>
+        ბიზნეს ლანჩი <br />
+        ორშაბათი - პარასკევი · 12:00 - 16:00
+      </h2>
+      <p style="color:#fff; margin-bottom:20px; font-size:20px;">
+        ნებისმიერი ბურგერი + კარტოფილი ფრი + გაზიანი სასმელი — მხოლოდ 25₾
+      </p>
+      <button class="btn" type="button" (click)="scrollToBookingTable()">
+        შეუკვეთე ახლა
+      </button>
+    </div>
+  </section>
+
+  <section id="chefs">
+    <team></team>
+  </section>
+
+  <menu></menu>
+
+  <section id="gallery">
+    <div class="title-center">
+      <h2>გალერეა</h2>
+    </div>
+    <div class="wrapper flex-row gallery-item">
+      <a
+        *ngFor="let img of galleryImages; let i = index"
+        [href]="img"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="gallery-link"
+      >
+        <img [src]="img" [alt]="'Burger Lions-ის ფოტო ' + (i + 1)" loading="lazy" />
+      </a>
+    </div>
+  </section>
+
+  <section id="booking-table">
+    <div class="title-center">
+      <h2>დაჯავშნე მაგიდა</h2>
+    </div>
+    <booking-form></booking-form>
+  </section>
+</main>
+
+<footer id="contacts"></footer>
+
+<button
+  *ngIf="hasScrolledPastHome"
+  type="button"
+  id="scroll-top"
+  (click)="scrollToTop($event)"
+  aria-label="დაბრუნება ზევით"
+>
+  <i class="fa-solid fa-arrow-up-long" aria-hidden="true"></i>
+</button>

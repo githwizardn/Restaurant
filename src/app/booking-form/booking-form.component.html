@@ -1,0 +1,70 @@
+<div class="wrapper flex-row wrapp-booking-form">
+  <div class="booking-form">
+    <form [formGroup]="reservationForm" (ngSubmit)="submitForm()" novalidate>
+      <div class="wrapp-input-group">
+        <div class="field">
+          <label for="name">სახელი</label>
+          <input id="name" type="text" formControlName="name" placeholder="სახელი" autocomplete="given-name" />
+          <small class="error" *ngIf="isInvalid('name')">
+            აუცილებელია მინიმუმ 2 ასო (ქართული ან ლათინური).
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="lastname">გვარი</label>
+          <input id="lastname" type="text" formControlName="lastname" placeholder="გვარი" autocomplete="family-name" />
+          <small class="error" *ngIf="isInvalid('lastname')">
+            აუცილებელია მინიმუმ 2 ასო (ქართული ან ლათინური).
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="phone">ტელეფონი</label>
+          <input id="phone" type="tel" formControlName="phone" placeholder="5XXXXXXXX" autocomplete="tel" />
+          <small class="error" *ngIf="isInvalid('phone')">შეიყვანეთ 9 ციფრი.</small>
+        </div>
+
+        <div class="field">
+          <label for="email">ელფოსტა</label>
+          <input id="email" type="email" formControlName="email" placeholder="you@example.com" autocomplete="email" />
+          <small class="error" *ngIf="isInvalid('email')">შეიყვანეთ სწორი ელფოსტა.</small>
+        </div>
+
+        <div class="field">
+          <label for="date">თარიღი</label>
+          <input id="date" type="date" formControlName="date" />
+          <small class="error" *ngIf="isInvalid('date')">აირჩიეთ მომავალი თარიღი.</small>
+        </div>
+
+        <div class="field">
+          <label for="time">საათი</label>
+          <input id="time" type="time" formControlName="time" />
+          <small class="error" *ngIf="isInvalid('time')">შეიყვანეთ სწორი დრო (HH:mm).</small>
+        </div>
+      </div>
+
+      <button type="submit" class="btn submit-btn" [disabled]="submitting">
+        {{ submitting ? 'იგზავნება…' : 'დადასტურება' }}
+      </button>
+
+      <p class="result" *ngIf="resultMessage" [class.error]="resultIsError" [class.success]="!resultIsError">
+        {{ resultMessage }}
+      </p>
+    </form>
+  </div>
+
+    <aside class="working-hours">
+    <h3>სამუშაო საათები</h3>
+    <p>
+      გვეწვიეთ ჩვენს მყუდრო სივრცეში. განიცადეთ ჩვენი კულინარიული ვნება და
+      უნიკალური ატმოსფერო. ჩვენ მოუთმენლად ველით თქვენთან შეხვედრას!
+    </p>
+    <div class="hours-row"><p>ორშაბათი</p><p>10:00 - 01:00</p></div>
+    <div class="hours-row"><p>სამშაბათი</p><p>10:00 - 01:00</p></div>
+    <div class="hours-row"><p>ოთხშაბათი</p><p>10:00 - 01:00</p></div>
+    <div class="hours-row"><p>ხუთშაბათი</p><p>10:00 - 01:00</p></div>
+    <div class="hours-row"><p>პარასკევი</p><p>10:00 - 01:00</p></div>
+    <div class="hours-row"><p>შაბათი</p><p>10:00 - 01:00</p></div>
+    <div class="hours-row"><p>კვირა</p><p>10:00 - 01:00</p></div>
+  </aside>
+</div>
