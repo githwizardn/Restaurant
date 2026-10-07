@@ -1,0 +1,18 @@
+<div class="title-center">
+  <h2>ჩვენი გუნდი</h2>
+  <p>
+    ჩვენი ნიჭიერი გუნდი აერთიანებს ვნებას და გამოცდილებას. შეხვდით ოსტატებს,
+    რომლებიც დგანან თითოეული კერძის უკან.
+  </p>
+</div>
+
+<div class="wrapper flex-row chefs">
+  <article class="chefs-item" *ngFor="let member of members">
+    <img [src]="member.image" [alt]="member.name" loading="lazy" width="400" height="500" />
+    <div class="about-chefs">
+      <h3>{{ member.name }}</h3>
+      <p class="role">{{ member.role }}</p>
+      <p class="bio">{{ member.bio }}</p>
+    </div>
+  </article>
+</div>

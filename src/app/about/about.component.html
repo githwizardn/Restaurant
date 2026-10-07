@@ -1,0 +1,42 @@
+<div class="wrapper flex-row">
+  <div class="about-img">
+    <img
+      ngSrc="https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800"
+      alt="Burger Lions-ის სამზარეულო"
+      width="600"
+      height="800"
+    />
+    <a
+      class="video-btn"
+      href="https://www.youtube.com/watch?v=xiWU6HmpIU0"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="ვიდეოს ნახვა YouTube-ზე"
+    >
+      <i class="fa-solid fa-play" aria-hidden="true"></i>
+    </a>
+  </div>
+
+  <div class="about-content">
+    <h2>ბურგერი, როგორც ჩვენ ვხედავთ</h2>
+
+    <p>
+      Burger Lions დაიბადა ერთი იდეით — ბურგერი უნდა იყოს მარტივი, მაგრამ
+      სრულყოფილი. ჩვენ თვითონ ვაცხობთ პურს, თვითონ ვამზადებთ სოუსებს და
+      ვიყენებთ მხოლოდ ახალ ხორცს, რომელიც ყოველ დილით მოგვაქვს.
+    </p>
+
+    <p>
+      აქ ყველაფერი გამჭვირვალეა — ღია სამზარეულო, სადაც დაინახავთ, როგორ
+      მზადდება თქვენი შეკვეთა. ჩვენი გუნდი ყოველ ბურგერს ისე ეკიდება, თითქოს
+      პირველი იყოს.
+    </p>
+
+    <div class="advantage flex-row">
+      <div *ngFor="let adv of advantages">
+        <img [src]="adv.icon" [alt]="adv.label" loading="lazy" width="60" height="60" />
+        <p>{{ adv.label }}</p>
+      </div>
+    </div>
+  </div>
+</div>

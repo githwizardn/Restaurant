@@ -1,0 +1,19 @@
+<div class="carousel-wrap" (mouseenter)="pause()" (mouseleave)="resume()">
+  <div class="carousel-track">
+    <article class="card" *ngFor="let dish of visibleDishes; trackBy: trackByTitle">
+      <img [src]="dish.img" [alt]="dish.title" loading="lazy" width="300" height="300" />
+      <h3>{{ dish.title }}</h3>
+      <p>{{ dish.description }}</p>
+      <p class="price">{{ dish.price }}</p>
+    </article>
+  </div>
+
+  <div class="carousel-nav">
+    <button type="button" (click)="prev()" aria-label="წინა კერძები">
+      <i class="fas fa-long-arrow-alt-left" aria-hidden="true"></i>
+    </button>
+    <button type="button" (click)="next()" aria-label="შემდეგი კერძები">
+      <i class="fas fa-long-arrow-alt-right" aria-hidden="true"></i>
+    </button>
+  </div>
+</div>
