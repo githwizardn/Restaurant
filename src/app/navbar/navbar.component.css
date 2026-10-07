@@ -1,3 +1,4 @@
+ 
 .navbar {
   position: fixed;
   top: 0;
@@ -25,19 +26,14 @@
   color: var(--color-text);
 }
 
-.brand-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+/* Burger Lions company logo */
+.brand-logo {
+  display: block;
   width: 48px;
   height: 48px;
-  background: var(--color-accent);
-  color: #000;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 900;
-  font-size: 16px;
-  letter-spacing: -1px;
-  border-radius: 50%;
+  object-fit: contain;
+  object-position: center;
+  flex-shrink: 0;
 }
 
 .brand-name {
@@ -104,10 +100,25 @@
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 992px) {
-  .navbar { padding: 0 20px; }
+  .navbar {
+    padding: 0 20px;
+  }
+
+  .brand-logo {
+    width: 44px;
+    height: 44px;
+  }
 }
+ 

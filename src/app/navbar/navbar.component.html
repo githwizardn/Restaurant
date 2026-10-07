@@ -1,6 +1,16 @@
 <header class="navbar" [class.is-transparent]="isTransparentBg">
-  <a class="brand" href="#home" (click)="navigate($event, '#home')" aria-label="Burger Lions — მთავარი">
-    <span class="brand-mark">BL</span>
+  <a
+    class="brand"
+    href="#home"
+    (click)="navigate($event, '#home')"
+    aria-label="Burger Lions — მთავარი"
+  >
+    <img
+      class="brand-logo"
+      src="https://burgerlions.com/wp-content/uploads/2024/08/New-Project-2.png"
+      alt="Burger Lions"
+    />
+
     <span class="brand-name">Burger&nbsp;Lions</span>
   </a>
 
@@ -12,7 +22,12 @@
     [attr.aria-expanded]="mobileMenuOpen"
     aria-label="მენიუს გახსნა"
   >
-    <i class="fa-solid" [class.fa-bars]="!mobileMenuOpen" [class.fa-xmark]="mobileMenuOpen" aria-hidden="true"></i>
+    <i
+      class="fa-solid"
+      [class.fa-bars]="!mobileMenuOpen"
+      [class.fa-xmark]="mobileMenuOpen"
+      aria-hidden="true"
+    ></i>
   </button>
 
   <nav *ngIf="!isSmallScreen" aria-label="მთავარი ნავიგაცია">
