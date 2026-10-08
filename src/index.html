@@ -1,31 +1,96 @@
 <!DOCTYPE html>
 <html lang="ka">
   <head>
-    <meta charset="utf-8" />
-    <title>Burger Lions — ნამდვილი ბურგერები ვარკეთილში</title>
-    <base href="/" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="Burger Lions — ხელნაკეთი ბურგერები ახალი ინგრედიენტებით. ვარკეთილი, თბილისი. შეუკვეთეთ ონლაინ."
-    />
-    <meta name="theme-color" content="#000000" />
-    <link
-  rel="icon"
-  type="image/png"
+  <meta charset="utf-8" />
+  <title>Burger Lions — ნამდვილი ბურგერები ვარკეთილში</title>
+  <base href="/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Primary Meta Tags -->
+  <meta
+    name="description"
+    content="Burger Lions — ხელნაკეთი ბურგერები ახალი ინგრედიენტებით. ვარკეთილი, თბილისი. შეუკვეთეთ ონლაინ."
+  />
+  <meta name="author" content="Burger Lions" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#000000" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Burger Lions" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="restaurant" />
+  <meta property="og:site_name" content="Burger Lions" />
+  <meta property="og:locale" content="ka_GE" />
+  <meta property="og:title" content="Burger Lions — ნამდვილი ბურგერები ვარკეთილში" />
+  <meta property="og:description" content="ხელნაკეთი ბურგერები ახალი ინგრედიენტებით. ვარკეთილი, თბილისი." />
+  <meta property="og:image" content="https://burgerlions.com/wp-content/uploads/2024/08/New-Project-2.png" />
+  <meta property="og:url" content="https://angular-beta-eight-80.vercel.app/" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Burger Lions — ნამდვილი ბურგერები ვარკეთილში" />
+  <meta name="twitter:description" content="ხელნაკეთი ბურგერები ახალი ინგრედიენტებით." />
+  <meta name="twitter:image" content="https://burgerlions.com/wp-content/uploads/2024/08/New-Project-2.png" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://angular-beta-eight-80.vercel.app/" />
+
+  <!-- Favicon -->
+  <link
+    rel="icon"
+    type="image/png"
     sizes="512x512"
-  href="https://burgerlions.com/wp-content/uploads/2024/08/New-Project-2.png"
->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-  </head>
+    href="https://burgerlions.com/wp-content/uploads/2024/08/New-Project-2.png"
+  />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <!-- JSON-LD structured data -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Restaurant",
+      "name": "Burger Lions",
+      "image": "https://burgerlions.com/wp-content/uploads/2024/08/New-Project-2.png",
+      "url": "https://angular-beta-eight-80.vercel.app/",
+      "telephone": "+995322560907",
+      "priceRange": "₾₾",
+      "servesCuisine": ["Burgers", "American", "Fast Food"],
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "41 ერთიანობისთვის მებრძოლთა ქ",
+        "addressLocality": "Tbilisi",
+        "postalCode": "0163",
+        "addressCountry": "GE"
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+          "opens": "10:00",
+          "closes": "01:00"
+        }
+      ]
+    }
+  </script>
+</head>
   <body>
     <app-root></app-root>
   </body>

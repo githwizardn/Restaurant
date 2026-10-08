@@ -4,10 +4,12 @@
   </div>
 
   <div class="wrapper flex-row tabs-wrap">
-    <ul class="list-menu">
-      <li *ngFor="let tab of tabs">
+    <ul class="list-menu" role="tablist" aria-label="მენიუს კატეგორიები">
+      <li *ngFor="let tab of tabs; trackBy: trackByTab" role="presentation">
         <button
           type="button"
+          role="tab"
+          [attr.aria-selected]="activeTab === tab"
           [class.active]="activeTab === tab"
           (click)="setActiveTab(tab)"
         >
@@ -19,13 +21,22 @@
 
   <div class="wrapper">
     <div class="menu-grid">
-      <article class="single-menu-item" *ngFor="let item of filteredItems; trackBy: trackById">
+      <article
+        class="single-menu-item"
+        *ngFor="let item of filteredItems; trackBy: trackById"
+      >
         <a
           data-bs-toggle="modal"
           [attr.data-bs-target]="'#' + 'item-' + item.id"
           [attr.aria-label]="'გაადიდე ' + item.name"
         >
-          <img [src]="item.imageUrl" [alt]="item.name" loading="lazy" width="400" height="300" />
+          <img
+            [src]="item.imageUrl"
+            [alt]="item.name"
+            loading="lazy"
+            width="400"
+            height="300"
+          />
         </a>
         <div class="single-menu-item-content">
           <h3>{{ item.name }}</h3>
@@ -38,7 +49,7 @@
 
   <div
     class="modal fade"
-    *ngFor="let item of filteredItems"
+    *ngFor="let item of filteredItems; trackBy: trackById"
     [id]="'item-' + item.id"
     tabindex="-1"
     [attr.aria-labelledby]="'item-' + item.id + '-label'"
@@ -47,11 +58,25 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content bg-dark">
         <div class="modal-header border-0">
-          <h5 class="modal-title text-white" [id]="'item-' + item.id + '-label'">{{ item.name }}</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="დახურვა"></button>
+          <h5
+            class="modal-title text-white"
+            [id]="'item-' + item.id + '-label'"
+          >
+            {{ item.name }}
+          </h5>
+          <button
+            type="button"
+            class="btn-close btn-close-white"
+            data-bs-dismiss="modal"
+            aria-label="დახურვა"
+          ></button>
         </div>
         <div class="modal-body">
-          <img [src]="item.imageUrl" [alt]="item.name" class="img-fluid rounded" />
+          <img
+            [src]="item.imageUrl"
+            [alt]="item.name"
+            class="img-fluid rounded"
+          />
           <p class="text-white mt-3">{{ item.description }}</p>
           <p class="price mt-2">{{ item.price }}</p>
         </div>

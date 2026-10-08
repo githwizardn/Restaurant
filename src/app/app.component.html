@@ -1,7 +1,10 @@
+<!-- Skip link for keyboard users -->
+<a href="#main" class="skip-link">მთავარ კონტენტზე გადასვლა</a>
+
 <navbar></navbar>
 
-<main>
-    <section id="home" class="flex-row">
+<main id="main" tabindex="-1">
+  <section id="home" class="flex-row">
     <div class="wrapper home-content">
       <div>
         <p class="eyebrow">Burger Lions · ვარკეთილი</p>
@@ -20,7 +23,9 @@
   <section id="special-dishes">
     <div class="title-center">
       <h2>ჩვენი ჰიტები</h2>
-      <p>საუკეთესო ბურგერები, რომლებიც ჩვენი სტუმრების ფავორიტებად იქცნენ.</p>
+      <p>
+        საუკეთესო ბურგერები, რომლებიც ჩვენი სტუმრების ფავორიტებად იქცნენ.
+      </p>
     </div>
     <div class="wrapper">
       <card-carousel></card-carousel>
@@ -31,7 +36,7 @@
     <about></about>
   </section>
 
-    <section id="offer">
+  <section id="offer">
     <div class="wrapper">
       <h2>
         ბიზნეს ლანჩი <br />
@@ -58,13 +63,17 @@
     </div>
     <div class="wrapper flex-row gallery-item">
       <a
-        *ngFor="let img of galleryImages; let i = index"
+        *ngFor="let img of galleryImages; let i = index; trackBy: trackByIndex"
         [href]="img"
         target="_blank"
         rel="noopener noreferrer"
         class="gallery-link"
       >
-        <img [src]="img" [alt]="'Burger Lions-ის ფოტო ' + (i + 1)" loading="lazy" />
+        <img
+          [src]="img"
+          [alt]="'Burger Lions-ის ფოტო ' + (i + 1)"
+          loading="lazy"
+        />
       </a>
     </div>
   </section>

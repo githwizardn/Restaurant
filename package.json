@@ -1,6 +1,6 @@
 {
-  "name": "restaurante-el89",
-  "version": "0.0.0",
+  "name": "burger-lions",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -17,6 +17,7 @@
     "@angular/forms": "16.2.0",
     "@angular/platform-browser": "16.2.0",
     "@angular/platform-browser-dynamic": "16.2.0",
+    "@angular/service-worker": "^16.2.0",
     "bootstrap": "^5.3.3",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

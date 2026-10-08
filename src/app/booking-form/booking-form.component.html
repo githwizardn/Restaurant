@@ -4,7 +4,13 @@
       <div class="wrapp-input-group">
         <div class="field">
           <label for="name">სახელი</label>
-          <input id="name" type="text" formControlName="name" placeholder="სახელი" autocomplete="given-name" />
+          <input
+            id="name"
+            type="text"
+            formControlName="name"
+            placeholder="სახელი"
+            autocomplete="given-name"
+          />
           <small class="error" *ngIf="isInvalid('name')">
             აუცილებელია მინიმუმ 2 ასო (ქართული ან ლათინური).
           </small>
@@ -12,7 +18,13 @@
 
         <div class="field">
           <label for="lastname">გვარი</label>
-          <input id="lastname" type="text" formControlName="lastname" placeholder="გვარი" autocomplete="family-name" />
+          <input
+            id="lastname"
+            type="text"
+            formControlName="lastname"
+            placeholder="გვარი"
+            autocomplete="family-name"
+          />
           <small class="error" *ngIf="isInvalid('lastname')">
             აუცილებელია მინიმუმ 2 ასო (ქართული ან ლათინური).
           </small>
@@ -20,26 +32,46 @@
 
         <div class="field">
           <label for="phone">ტელეფონი</label>
-          <input id="phone" type="tel" formControlName="phone" placeholder="5XXXXXXXX" autocomplete="tel" />
-          <small class="error" *ngIf="isInvalid('phone')">შეიყვანეთ 9 ციფრი.</small>
+          <input
+            id="phone"
+            type="tel"
+            formControlName="phone"
+            placeholder="5XXXXXXXX"
+            autocomplete="tel"
+          />
+          <small class="error" *ngIf="isInvalid('phone')">
+            შეიყვანეთ 9 ციფრი.
+          </small>
         </div>
 
         <div class="field">
           <label for="email">ელფოსტა</label>
-          <input id="email" type="email" formControlName="email" placeholder="you@example.com" autocomplete="email" />
-          <small class="error" *ngIf="isInvalid('email')">შეიყვანეთ სწორი ელფოსტა.</small>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+          />
+          <small class="error" *ngIf="isInvalid('email')">
+            შეიყვანეთ სწორი ელფოსტა.
+          </small>
         </div>
 
         <div class="field">
           <label for="date">თარიღი</label>
           <input id="date" type="date" formControlName="date" />
-          <small class="error" *ngIf="isInvalid('date')">აირჩიეთ მომავალი თარიღი.</small>
+          <small class="error" *ngIf="isInvalid('date')">
+            აირჩიეთ მომავალი თარიღი.
+          </small>
         </div>
 
         <div class="field">
           <label for="time">საათი</label>
           <input id="time" type="time" formControlName="time" />
-          <small class="error" *ngIf="isInvalid('time')">შეიყვანეთ სწორი დრო (HH:mm).</small>
+          <small class="error" *ngIf="isInvalid('time')">
+            შეიყვანეთ სწორი დრო (HH:mm).
+          </small>
         </div>
       </div>
 
@@ -47,13 +79,31 @@
         {{ submitting ? 'იგზავნება…' : 'დადასტურება' }}
       </button>
 
-      <p class="result" *ngIf="resultMessage" [class.error]="resultIsError" [class.success]="!resultIsError">
-        {{ resultMessage }}
-      </p>
+      <div aria-live="polite" aria-atomic="true">
+        <p
+          class="result"
+          *ngIf="resultMessage"
+          [class.error]="resultIsError"
+          [class.success]="!resultIsError"
+        >
+          {{ resultMessage }}
+        </p>
+
+        <a
+          *ngIf="whatsappLink"
+          class="btn whatsapp-btn"
+          [href]="whatsappLink"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+          WhatsApp-ზე დადასტურება
+        </a>
+      </div>
     </form>
   </div>
 
-    <aside class="working-hours">
+  <aside class="working-hours">
     <h3>სამუშაო საათები</h3>
     <p>
       გვეწვიეთ ჩვენს მყუდრო სივრცეში. განიცადეთ ჩვენი კულინარიული ვნება და

@@ -10,25 +10,43 @@
       src="https://burgerlions.com/wp-content/uploads/2024/08/New-Project-2.png"
       alt="Burger Lions"
     />
-
     <span class="brand-name">Burger&nbsp;Lions</span>
   </a>
 
-  <button
-    type="button"
-    class="menu-toggle"
-    *ngIf="isSmallScreen"
-    (click)="toggleMobileMenu()"
-    [attr.aria-expanded]="mobileMenuOpen"
-    aria-label="მენიუს გახსნა"
-  >
-    <i
-      class="fa-solid"
-      [class.fa-bars]="!mobileMenuOpen"
-      [class.fa-xmark]="mobileMenuOpen"
-      aria-hidden="true"
-    ></i>
-  </button>
+  <div class="nav-actions">
+    <!-- Theme Toggle -->
+    <button
+      type="button"
+      class="theme-toggle"
+      (click)="toggleTheme()"
+      [attr.aria-label]="isLightTheme ? 'მუქ თემაზე გადართვა' : 'ნათელ თემაზე გადართვა'"
+      [attr.aria-pressed]="isLightTheme"
+    >
+      <i
+        class="fa-solid"
+        [class.fa-moon]="isLightTheme"
+        [class.fa-sun]="!isLightTheme"
+        aria-hidden="true"
+      ></i>
+    </button>
+
+    <!-- Mobile menu toggle -->
+    <button
+      type="button"
+      class="menu-toggle"
+      *ngIf="isSmallScreen"
+      (click)="toggleMobileMenu()"
+      [attr.aria-expanded]="mobileMenuOpen"
+      aria-label="მენიუს გახსნა"
+    >
+      <i
+        class="fa-solid"
+        [class.fa-bars]="!mobileMenuOpen"
+        [class.fa-xmark]="mobileMenuOpen"
+        aria-hidden="true"
+      ></i>
+    </button>
+  </div>
 
   <nav *ngIf="!isSmallScreen" aria-label="მთავარი ნავიგაცია">
     <ul class="menu">

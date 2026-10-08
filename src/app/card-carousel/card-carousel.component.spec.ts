@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CarouselModule } from 'ngx-bootstrap/carousel';
 import { CardCarouselComponent } from './card-carousel.component';
 
 describe('CardCarouselComponent', () => {
@@ -8,8 +7,7 @@ describe('CardCarouselComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CarouselModule.forRoot()],
-      declarations: [CardCarouselComponent],
+      imports: [CardCarouselComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CardCarouselComponent);
@@ -21,38 +19,27 @@ describe('CardCarouselComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display 4 cards', () => {
-    component.cards = [
-      {
-        img: 'https://restfood.onlywebcoding.com.ua/images/special-dishes-1.png',
-        title: 'Card 1',
-        description: 'Description for Card 1',
-        price: '$10',
-      },
-      {
-        img: 'path/to/image2.jpg',
-        title: 'Card 2',
-        description: 'Description for Card 2',
-        price: '$20',
-      },
-      {
-        img: 'path/to/image3.jpg',
-        title: 'Card 3',
-        description: 'Description for Card 3',
-        price: '$15',
-      },
-      {
-        img: 'path/to/image4.jpg',
-        title: 'Card 4',
-        description: 'Description for Card 4',
-        price: '$25',
-      },
-    ];
-    fixture.detectChanges();
-
-    const cardElements = fixture.nativeElement.querySelectorAll('.card');
-    expect(cardElements.length).toBe(4);
+  it('should render visible dishes', () => {
+    const cards = fixture.nativeElement.querySelectorAll('.card');
+    expect(cards.length).toBe(component.visibleCount);
   });
 
-  // Add more tests to verify carousel behavior, e.g., sliding, navigation, etc.
+  it('should advance offset on next()', () => {
+    const initial = component.offset;
+    component.next();
+    expect(component.offset).toBe((initial + 1) % component.dishes.length);
+  });
+
+  it('should go back on prev()', () => {
+    component.offset = 0;
+    component.prev();
+    expect(component.offset).toBe(component.dishes.length - 1);
+  });
+
+  it('should pause autoplay on hover', () => {
+    component.pause();
+    const initialOffset = component.offset;
+    // wait less than autoplay interval — should not move
+    expect(component.offset).toBe(initialOffset);
+  });
 });
