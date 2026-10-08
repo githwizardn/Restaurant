@@ -2,10 +2,13 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  OnDestroy,
   OnInit,
+  PLATFORM_ID,
   inject,
+  signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
   AbstractControl,
   FormBuilder,
@@ -21,6 +24,17 @@ import { environment } from '../../environments/environment';
 
 const DRAFT_STORAGE_KEY = 'burger-lions:booking-draft';
 
+interface BookingPayload {
+  name: string;
+  lastname: string;
+  phone: string;
+  email: string;
+  date: string;
+  time: string;
+  guests: number;
+  notes: string;
+}
+
 function georgianAndEnglishValidator(): ValidatorFn {
   return Validators.pattern(/^[a-zA-Zა-ჰ\s]+$/);
 }
@@ -31,7 +45,47 @@ function futureDateValidator(): ValidatorFn {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const input = new Date(control.value);
-    return input > today ? null : { invalidDate: true };
+    return input >= today ? null : { invalidDate: true };
+  };
+}
+
+function maxDateValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (!control.value) return null;
+    const max = new Date();
+    max.setFullYear(max.getFullYear() + 1);
+    const input = new Date(control.value);
+    return input <= max ? null : { dateTooFar: true };
+  };
+}
+
+/**
+ * რესტორანი ღიაა 10:00 – 01:00
+ * ბოლო ჯავშანი მიიღება 00:00-მდე (1 საათი დაკეტვამდე).
+ * პრაქტიკულად ვალიდური დრო: 10:00 – 23:59.
+ */
+function workingHoursValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (!control.value) return null;
+
+    const [h, m] = (control.value as string).split(':').map(Number);
+    if (Number.isNaN(h) || Number.isNaN(m)) return null;
+
+    const totalMinutes = h * 60 + m;
+
+    // 10:00 = 600 წუთი
+    if (totalMinutes < 600) {
+      return { beforeOpening: true };
+    }
+
+    // 00:00 (შუაღამის შემდეგ) — არ ვაძლევთ ჯავშანს
+    // ანუ ვალიდურია მხოლოდ 10:00 – 23:59
+    // (23:59 = 1439 წუთი)
+    if (totalMinutes > 1439) {
+      return { afterClosing: true };
+    }
+
+    return null;
   };
 }
 
@@ -43,59 +97,100 @@ function futureDateValidator(): ValidatorFn {
   styleUrls: ['./booking-form.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BookingFormComponent implements OnInit {
+export class BookingFormComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly booking = inject(BookingService);
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly isBrowser = isPlatformBrowser(this.platformId);
 
+  // === Wizard state ===
+  readonly currentStep = signal(0);
+  readonly totalSteps = 3;
+  readonly steps = [
+    { label: 'დრო', icon: 'fa-calendar-day' },
+    { label: 'კონტაქტი', icon: 'fa-user' },
+    { label: 'დეტალები', icon: 'fa-circle-check' },
+  ];
+
+  // === Form state ===
   submitting = false;
   resultMessage = '';
   resultIsError = false;
   whatsappLink = '';
+  showSuccess = false;
+  successData: BookingPayload | null = null;
+
+  // === Guests ===
+  guests = 2;
+  readonly maxGuests = 20;
+  readonly minGuests = 1;
+
+  // === Quick picks ===
+  readonly quickTimes = ['12:00', '13:00', '18:00', '19:00', '20:00', '21:00'];
+  readonly quickDates = [
+    { label: 'დღეს', offset: 0 as number, dayOfWeek: undefined as number | undefined },
+    { label: 'ხვალ', offset: 1 as number, dayOfWeek: undefined as number | undefined },
+    { label: 'ზეგ', offset: 2 as number, dayOfWeek: undefined as number | undefined },
+    { label: 'შაბათს', offset: 0 as number, dayOfWeek: 6 as number | undefined },
+  ];
+
+  // === Min/Max dates ===
+  readonly minDate = new Date().toISOString().split('T')[0];
+  readonly maxDate = (() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() + 1);
+    return d.toISOString().split('T')[0];
+  })();
+
+  // === Voice input ===
+  readonly isListening = signal(false);
+  readonly voiceSupported = signal(false);
+  private recognition: any = null;
 
   readonly reservationForm = this.fb.nonNullable.group({
     name: [
       '',
-      [
-        Validators.required,
-        Validators.minLength(2),
-        georgianAndEnglishValidator(),
-      ],
+      [Validators.required, Validators.minLength(2), georgianAndEnglishValidator()],
     ],
     lastname: [
       '',
-      [
-        Validators.required,
-        Validators.minLength(2),
-        georgianAndEnglishValidator(),
-      ],
+      [Validators.required, Validators.minLength(2), georgianAndEnglishValidator()],
     ],
-    phone: ['', [Validators.required, Validators.pattern(/^\d{9}$/)]],
-    email: ['', [Validators.required, Validators.email]],
-    date: ['', [Validators.required, futureDateValidator()]],
+    phone: [
+      '',
+      [Validators.required, Validators.pattern(/^5\d{2}\s?\d{3}\s?\d{3}$/)],
+    ],
+    email: ['', [Validators.email]],
+    date: ['', [Validators.required, futureDateValidator(), maxDateValidator()]],
     time: [
       '',
       [
         Validators.required,
         Validators.pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/),
+        workingHoursValidator(),
       ],
     ],
+    guests: [2, [Validators.required, Validators.min(1), Validators.max(20)]],
+    notes: ['', [Validators.maxLength(300)]],
   });
 
   constructor() {
+    if (this.isBrowser) {
+      this.initVoiceRecognition();
+    }
+
     this.reservationForm.valueChanges
       .pipe(takeUntilDestroyed(), debounceTime(300))
       .subscribe(value => {
-        // Save draft (except the moment when submitting just finished)
         if (!this.submitting) {
           try {
             localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(value));
           } catch {
-            /* ignore quota / private mode errors */
+            /* ignore */
           }
         }
 
-        // Clear result message once user starts typing again
         if (this.resultMessage) {
           this.resultMessage = '';
           this.whatsappLink = '';
@@ -108,36 +203,298 @@ export class BookingFormComponent implements OnInit {
     this.restoreDraft();
   }
 
+  ngOnDestroy(): void {
+    if (this.recognition && this.isListening()) {
+      try {
+        this.recognition.stop();
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
+  // ================================================================
+  // WIZARD NAVIGATION
+  // ================================================================
+
+  get stepControls(): string[][] {
+    return [
+      ['date', 'time', 'guests'],
+      ['name', 'lastname', 'phone', 'email'],
+      ['notes'],
+    ];
+  }
+
+  get currentStepValid(): boolean {
+    const controls = this.stepControls[this.currentStep()];
+    return controls.every(c => {
+      const ctrl = this.reservationForm.get(c);
+      if (c === 'email' && !ctrl?.value) return true;
+      return ctrl?.valid;
+    });
+  }
+
+  get isLastStep(): boolean {
+    return this.currentStep() === this.totalSteps - 1;
+  }
+
+  get isFirstStep(): boolean {
+    return this.currentStep() === 0;
+  }
+
+  nextStep(): void {
+    if (!this.currentStepValid) {
+      this.stepControls[this.currentStep()].forEach(c => {
+        this.reservationForm.get(c)?.markAsTouched();
+      });
+      this.cdr.markForCheck();
+      return;
+    }
+
+    if (this.currentStep() < this.totalSteps - 1) {
+      this.currentStep.update(s => s + 1);
+      this.cdr.markForCheck();
+    } else {
+      this.submitForm();
+    }
+  }
+
+  prevStep(): void {
+    if (this.currentStep() > 0) {
+      this.currentStep.update(s => s - 1);
+      this.cdr.markForCheck();
+    }
+  }
+
+  goToStep(index: number): void {
+    if (index <= this.currentStep()) {
+      this.currentStep.set(index);
+      this.cdr.markForCheck();
+    }
+  }
+
+  get progress(): number {
+    const required = ['date', 'time', 'name', 'lastname', 'phone'];
+    const filled = required.filter(c => this.reservationForm.get(c)?.valid).length;
+    return Math.round((filled / required.length) * 100);
+  }
+
+  // ================================================================
+  // GUESTS
+  // ================================================================
+
+  incrementGuests(): void {
+    if (this.guests < this.maxGuests) {
+      this.guests++;
+      this.reservationForm.patchValue({ guests: this.guests });
+      this.cdr.markForCheck();
+    }
+  }
+
+  decrementGuests(): void {
+    if (this.guests > this.minGuests) {
+      this.guests--;
+      this.reservationForm.patchValue({ guests: this.guests });
+      this.cdr.markForCheck();
+    }
+  }
+
+  // ================================================================
+  // QUICK PICKS
+  // ================================================================
+
+  selectTime(time: string): void {
+    this.reservationForm.patchValue({ time });
+    this.reservationForm.get('time')?.markAsDirty();
+    this.cdr.markForCheck();
+  }
+
+  selectDate(offset: number, dayOfWeek?: number): void {
+    const d = new Date();
+    if (typeof dayOfWeek === 'number') {
+      const currentDay = d.getDay();
+      let diff = dayOfWeek - currentDay;
+      if (diff <= 0) diff += 7;
+      d.setDate(d.getDate() + diff);
+    } else {
+      d.setDate(d.getDate() + offset);
+    }
+    const iso = d.toISOString().split('T')[0];
+    this.reservationForm.patchValue({ date: iso });
+    this.reservationForm.get('date')?.markAsDirty();
+    this.cdr.markForCheck();
+  }
+
+  isQuickDateActive(offset: number, dayOfWeek?: number): boolean {
+    const current = this.reservationForm.get('date')?.value;
+    if (!current) return false;
+    const d = new Date();
+    if (typeof dayOfWeek === 'number') {
+      const currentDay = d.getDay();
+      let diff = dayOfWeek - currentDay;
+      if (diff <= 0) diff += 7;
+      d.setDate(d.getDate() + diff);
+    } else {
+      d.setDate(d.getDate() + offset);
+    }
+    return current === d.toISOString().split('T')[0];
+  }
+
+  // ================================================================
+  // VOICE INPUT
+  // ================================================================
+
+  private initVoiceRecognition(): void {
+    const SR =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) return;
+
+    this.voiceSupported.set(true);
+    this.recognition = new SR();
+    this.recognition.lang = 'ka-GE';
+    this.recognition.continuous = false;
+    this.recognition.interimResults = false;
+    this.recognition.maxAlternatives = 1;
+
+    this.recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      this.handleVoiceInput(transcript);
+      this.isListening.set(false);
+      this.cdr.markForCheck();
+    };
+
+    this.recognition.onerror = () => {
+      this.isListening.set(false);
+      this.cdr.markForCheck();
+    };
+
+    this.recognition.onend = () => {
+      this.isListening.set(false);
+      this.cdr.markForCheck();
+    };
+  }
+
+  toggleVoice(): void {
+    if (!this.recognition) return;
+    if (this.isListening()) {
+      try {
+        this.recognition.stop();
+      } catch {
+        /* ignore */
+      }
+      this.isListening.set(false);
+    } else {
+      try {
+        this.recognition.start();
+        this.isListening.set(true);
+      } catch {
+        this.isListening.set(false);
+      }
+    }
+    this.cdr.markForCheck();
+  }
+
+  private handleVoiceInput(transcript: string): void {
+    const lower = transcript.toLowerCase();
+
+    const numberMap: Record<string, number> = {
+      'ერთი': 1,
+      'ორი': 2,
+      'სამი': 3,
+      'ოთხი': 4,
+      'ხუთი': 5,
+      'ექვსი': 6,
+      'შვიდი': 7,
+      'რვა': 8,
+      'ცხრა': 9,
+      'ათი': 10,
+    };
+
+    for (const [word, num] of Object.entries(numberMap)) {
+      if (lower.includes(word)) {
+        this.guests = num;
+        this.reservationForm.patchValue({ guests: num });
+        break;
+      }
+    }
+
+    const timeMatch = lower.match(/(\d{1,2})[:.](\d{2})/);
+    if (timeMatch) {
+      const h = timeMatch[1].padStart(2, '0');
+      const m = timeMatch[2];
+      this.reservationForm.patchValue({ time: `${h}:${m}` });
+    } else {
+      const hourMatch = lower.match(/(\d{1,2})\s*საათ/);
+      if (hourMatch) {
+        const h = hourMatch[1].padStart(2, '0');
+        this.reservationForm.patchValue({ time: `${h}:00` });
+      }
+    }
+
+    if (lower.includes('ხვალ')) {
+      const d = new Date();
+      d.setDate(d.getDate() + 1);
+      this.reservationForm.patchValue({ date: d.toISOString().split('T')[0] });
+    } else if (lower.includes('ზეგ')) {
+      const d = new Date();
+      d.setDate(d.getDate() + 2);
+      this.reservationForm.patchValue({ date: d.toISOString().split('T')[0] });
+    } else if (lower.includes('დღეს')) {
+      this.reservationForm.patchValue({ date: new Date().toISOString().split('T')[0] });
+    }
+
+    this.cdr.markForCheck();
+  }
+
+  // ================================================================
+  // VALIDATION HELPERS
+  // ================================================================
+
   isInvalid(field: string): boolean {
     const ctrl = this.reservationForm.get(field);
     return !!ctrl && ctrl.invalid && (ctrl.dirty || ctrl.touched);
   }
+
+  hasError(field: string, errorCode: string): boolean {
+    const ctrl = this.reservationForm.get(field);
+    if (!ctrl) return false;
+    const touched = ctrl.dirty || ctrl.touched;
+    return !!ctrl.errors?.[errorCode] && touched;
+  }
+
+  // ================================================================
+  // SUBMIT
+  // ================================================================
 
   submitForm(): void {
     if (this.reservationForm.invalid) {
       this.reservationForm.markAllAsTouched();
       this.resultMessage = 'გთხოვთ, ყველა ველი სწორად შეავსოთ.';
       this.resultIsError = true;
-      this.whatsappLink = '';
       this.cdr.markForCheck();
       return;
     }
 
     this.submitting = true;
     this.resultMessage = '';
-    this.whatsappLink = '';
     this.cdr.markForCheck();
 
-    const payload = this.reservationForm.getRawValue();
+    const payload = this.reservationForm.getRawValue() as BookingPayload;
 
     this.booking.submit(payload).subscribe({
       next: () => {
         this.submitting = false;
-        this.resultMessage = 'მადლობა! ჩვენ მალე დაგიკავშირდებით.';
+        this.successData = payload;
+        this.showSuccess = true;
         this.resultIsError = false;
         this.whatsappLink = this.buildWhatsappLink(payload);
 
-        this.reservationForm.reset();
+        this.fireConfetti();
+
+        this.reservationForm.reset({ guests: 2 } as any);
+        this.guests = 2;
+        this.currentStep.set(0);
+
         try {
           localStorage.removeItem(DRAFT_STORAGE_KEY);
         } catch {
@@ -150,27 +507,151 @@ export class BookingFormComponent implements OnInit {
         this.resultMessage =
           'დაფიქსირდა შეცდომა. გთხოვთ, სცადოთ მოგვიანებით.';
         this.resultIsError = true;
-        this.whatsappLink = '';
         this.cdr.markForCheck();
       },
     });
   }
 
-  private buildWhatsappLink(payload: {
-    name: string;
-    lastname: string;
-    phone: string;
-    date: string;
-    time: string;
-  }): string {
+  resetForm(): void {
+    this.showSuccess = false;
+    this.successData = null;
+    this.whatsappLink = '';
+    this.currentStep.set(0);
+    this.reservationForm.reset({ guests: 2 } as any);
+    this.guests = 2;
+    this.cdr.markForCheck();
+  }
+
+  // ================================================================
+  // CONFETTI
+  // ================================================================
+
+  private async fireConfetti(): Promise<void> {
+    if (!this.isBrowser) return;
+    try {
+      const mod = await import('canvas-confetti');
+      const confetti = (mod as any).default ?? (mod as any);
+
+      const duration = 2500;
+      const animationEnd = Date.now() + duration;
+      const colors = ['#ffcc33', '#ffffff', '#ffaa00', '#ffdd55'];
+
+      const frame = () => {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) return;
+
+        const particleCount = 40 * (timeLeft / duration);
+        confetti({
+          particleCount,
+          startVelocity: 30,
+          spread: 360,
+          ticks: 60,
+          zIndex: 9999,
+          origin: { x: Math.random(), y: Math.random() - 0.2 },
+          colors,
+        });
+
+        requestAnimationFrame(frame);
+      };
+
+      frame();
+    } catch {
+      /* ignore */
+    }
+  }
+
+  // ================================================================
+  // CALENDAR EXPORT (.ics)
+  // ================================================================
+
+  downloadCalendar(): void {
+    if (!this.successData) return;
+
+    const { name, lastname, date, time, guests, phone, notes } = this.successData;
+    const [year, month, day] = date.split('-').map(Number);
+    const [hour, minute] = time.split(':').map(Number);
+
+    const start = new Date(year, month - 1, day, hour, minute);
+    const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+
+    const formatDate = (d: Date): string => {
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      return (
+        d.getUTCFullYear() +
+        pad(d.getUTCMonth() + 1) +
+        pad(d.getUTCDate()) +
+        'T' +
+        pad(d.getUTCHours()) +
+        pad(d.getUTCMinutes()) +
+        '00Z'
+      );
+    };
+
+    const description = [
+      `სახელი: ${name} ${lastname}`,
+      `ტელეფონი: ${phone}`,
+      `სტუმრები: ${guests}`,
+      notes ? `შენიშვნა: ${notes}` : '',
+    ]
+      .filter(Boolean)
+      .join('\\n');
+
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Burger Lions//Booking//KA',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      `UID:${Date.now()}@burgerlions.ge`,
+      `DTSTAMP:${formatDate(new Date())}`,
+      `DTSTART:${formatDate(start)}`,
+      `DTEND:${formatDate(end)}`,
+      `SUMMARY:Burger Lions — მაგიდის ჯავშანი (${guests} სტუმარი)`,
+      `DESCRIPTION:${description}`,
+      'LOCATION:41 ერთიანობისთვის მებრძოლთა ქ, Tbilisi 0163',
+      'STATUS:CONFIRMED',
+      'BEGIN:VALARM',
+      'TRIGGER:-PT1H',
+      'ACTION:DISPLAY',
+      'DESCRIPTION:Burger Lions — შეხსენება 1 საათით ადრე',
+      'END:VALARM',
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n');
+
+    const blob = new Blob([icsContent], {
+      type: 'text/calendar;charset=utf-8',
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `burger-lions-${date}-${time.replace(':', '')}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  // ================================================================
+  // WHATSAPP
+  // ================================================================
+
+  private buildWhatsappLink(payload: BookingPayload): string {
     const text =
       `გამარჯობა! მინდა მაგიდის დაჯავშნა:%0A` +
       `სახელი: ${payload.name} ${payload.lastname}%0A` +
       `ტელეფონი: ${payload.phone}%0A` +
       `თარიღი: ${payload.date}%0A` +
-      `დრო: ${payload.time}`;
+      `დრო: ${payload.time}%0A` +
+      `სტუმრები: ${payload.guests}` +
+      (payload.notes ? `%0Aშენიშვნა: ${payload.notes}` : '');
     return `https://wa.me/${environment.whatsappNumber}?text=${text}`;
   }
+
+  // ================================================================
+  // DRAFT
+  // ================================================================
 
   private restoreDraft(): void {
     try {
@@ -179,9 +660,45 @@ export class BookingFormComponent implements OnInit {
       const parsed = JSON.parse(raw);
       if (parsed && typeof parsed === 'object') {
         this.reservationForm.patchValue(parsed, { emitEvent: false });
+        if (typeof parsed.guests === 'number') {
+          this.guests = parsed.guests;
+        }
       }
     } catch {
       /* ignore */
     }
+  }
+
+  // ================================================================
+  // HELPERS
+  // ================================================================
+
+  formatDateKa(iso: string): string {
+    if (!iso) return '';
+    const date = new Date(iso);
+    const monthsKa = [
+      'იანვარი',
+      'თებერვალი',
+      'მარტი',
+      'აპრილი',
+      'მაისი',
+      'ივნისი',
+      'ივლისი',
+      'აგვისტო',
+      'სექტემბერი',
+      'ოქტომბერი',
+      'ნოემბერი',
+      'დეკემბერი',
+    ];
+    const daysKa = [
+      'კვირა',
+      'ორშაბათი',
+      'სამშაბათი',
+      'ოთხშაბათი',
+      'ხუთშაბათი',
+      'პარასკევი',
+      'შაბათი',
+    ];
+    return `${date.getDate()} ${monthsKa[date.getMonth()]}, ${date.getFullYear()} (${daysKa[date.getDay()]})`;
   }
 }
