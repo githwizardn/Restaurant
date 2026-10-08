@@ -142,7 +142,6 @@
                 max="23:59"
               />
 
-              <!-- Working hours errors -->
               <small class="error" *ngIf="hasError('time', 'beforeOpening')">
                 <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
                 რესტორანი იხსნება 10:00 საათზე.
@@ -283,29 +282,9 @@
         </div>
 
         <!-- ============================================ -->
-        <!-- STEP 3: NOTES + VOICE -->
+        <!-- STEP 3: NOTES -->
         <!-- ============================================ -->
         <div class="step-content" *ngIf="currentStep() === 2">
-          <div class="voice-section" *ngIf="voiceSupported()">
-            <button
-              type="button"
-              class="voice-btn"
-              [class.listening]="isListening()"
-              (click)="toggleVoice()"
-              [attr.aria-label]="isListening() ? 'შეჩერდი' : 'ხმით შევსება'"
-            >
-              <i
-                class="fa-solid"
-                [ngClass]="isListening() ? 'fa-microphone-slash' : 'fa-microphone'"
-                aria-hidden="true"
-              ></i>
-              <span>{{ isListening() ? 'ისმენს…' : 'ხმით შევსება' }}</span>
-            </button>
-            <small class="hint">
-              თქვი: "ორი სტუმარი ხვალ 19 საათზე"
-            </small>
-          </div>
-
           <div class="field">
             <label for="notes">
               სპეციალური სურვილები

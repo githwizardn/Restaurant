@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  OnDestroy,
   OnInit,
   PLATFORM_ID,
   inject,
@@ -73,14 +72,10 @@ function workingHoursValidator(): ValidatorFn {
 
     const totalMinutes = h * 60 + m;
 
-    // 10:00 = 600 წუთი
     if (totalMinutes < 600) {
       return { beforeOpening: true };
     }
 
-    // 00:00 (შუაღამის შემდეგ) — არ ვაძლევთ ჯავშანს
-    // ანუ ვალიდურია მხოლოდ 10:00 – 23:59
-    // (23:59 = 1439 წუთი)
     if (totalMinutes > 1439) {
       return { afterClosing: true };
     }
@@ -97,7 +92,7 @@ function workingHoursValidator(): ValidatorFn {
   styleUrls: ['./booking-form.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BookingFormComponent implements OnInit, OnDestroy {
+export class BookingFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly booking = inject(BookingService);
@@ -143,11 +138,6 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     return d.toISOString().split('T')[0];
   })();
 
-  // === Voice input ===
-  readonly isListening = signal(false);
-  readonly voiceSupported = signal(false);
-  private recognition: any = null;
-
   readonly reservationForm = this.fb.nonNullable.group({
     name: [
       '',
@@ -176,10 +166,6 @@ export class BookingFormComponent implements OnInit, OnDestroy {
   });
 
   constructor() {
-    if (this.isBrowser) {
-      this.initVoiceRecognition();
-    }
-
     this.reservationForm.valueChanges
       .pipe(takeUntilDestroyed(), debounceTime(300))
       .subscribe(value => {
@@ -201,16 +187,6 @@ export class BookingFormComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.restoreDraft();
-  }
-
-  ngOnDestroy(): void {
-    if (this.recognition && this.isListening()) {
-      try {
-        this.recognition.stop();
-      } catch {
-        /* ignore */
-      }
-    }
   }
 
   // ================================================================
@@ -338,112 +314,6 @@ export class BookingFormComponent implements OnInit, OnDestroy {
       d.setDate(d.getDate() + offset);
     }
     return current === d.toISOString().split('T')[0];
-  }
-
-  // ================================================================
-  // VOICE INPUT
-  // ================================================================
-
-  private initVoiceRecognition(): void {
-    const SR =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SR) return;
-
-    this.voiceSupported.set(true);
-    this.recognition = new SR();
-    this.recognition.lang = 'ka-GE';
-    this.recognition.continuous = false;
-    this.recognition.interimResults = false;
-    this.recognition.maxAlternatives = 1;
-
-    this.recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      this.handleVoiceInput(transcript);
-      this.isListening.set(false);
-      this.cdr.markForCheck();
-    };
-
-    this.recognition.onerror = () => {
-      this.isListening.set(false);
-      this.cdr.markForCheck();
-    };
-
-    this.recognition.onend = () => {
-      this.isListening.set(false);
-      this.cdr.markForCheck();
-    };
-  }
-
-  toggleVoice(): void {
-    if (!this.recognition) return;
-    if (this.isListening()) {
-      try {
-        this.recognition.stop();
-      } catch {
-        /* ignore */
-      }
-      this.isListening.set(false);
-    } else {
-      try {
-        this.recognition.start();
-        this.isListening.set(true);
-      } catch {
-        this.isListening.set(false);
-      }
-    }
-    this.cdr.markForCheck();
-  }
-
-  private handleVoiceInput(transcript: string): void {
-    const lower = transcript.toLowerCase();
-
-    const numberMap: Record<string, number> = {
-      'ერთი': 1,
-      'ორი': 2,
-      'სამი': 3,
-      'ოთხი': 4,
-      'ხუთი': 5,
-      'ექვსი': 6,
-      'შვიდი': 7,
-      'რვა': 8,
-      'ცხრა': 9,
-      'ათი': 10,
-    };
-
-    for (const [word, num] of Object.entries(numberMap)) {
-      if (lower.includes(word)) {
-        this.guests = num;
-        this.reservationForm.patchValue({ guests: num });
-        break;
-      }
-    }
-
-    const timeMatch = lower.match(/(\d{1,2})[:.](\d{2})/);
-    if (timeMatch) {
-      const h = timeMatch[1].padStart(2, '0');
-      const m = timeMatch[2];
-      this.reservationForm.patchValue({ time: `${h}:${m}` });
-    } else {
-      const hourMatch = lower.match(/(\d{1,2})\s*საათ/);
-      if (hourMatch) {
-        const h = hourMatch[1].padStart(2, '0');
-        this.reservationForm.patchValue({ time: `${h}:00` });
-      }
-    }
-
-    if (lower.includes('ხვალ')) {
-      const d = new Date();
-      d.setDate(d.getDate() + 1);
-      this.reservationForm.patchValue({ date: d.toISOString().split('T')[0] });
-    } else if (lower.includes('ზეგ')) {
-      const d = new Date();
-      d.setDate(d.getDate() + 2);
-      this.reservationForm.patchValue({ date: d.toISOString().split('T')[0] });
-    } else if (lower.includes('დღეს')) {
-      this.reservationForm.patchValue({ date: new Date().toISOString().split('T')[0] });
-    }
-
-    this.cdr.markForCheck();
   }
 
   // ================================================================
