@@ -17,6 +17,7 @@ import { FooterComponent } from './footer/footer.component';
 import { ScrollService } from './services/scroll.service';
 import { SeoService } from './services/seo.service';
 import { ThemeService } from './services/theme.service';
+import { ScrollRevealDirective } from './directives/scroll-reveal.directive';
 
 @Component({
   selector: 'app-root',
@@ -30,6 +31,7 @@ import { ThemeService } from './services/theme.service';
     CardCarouselComponent,
     BookingFormComponent,
     FooterComponent,
+    ScrollRevealDirective,
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],

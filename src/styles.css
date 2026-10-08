@@ -290,3 +290,57 @@ img {
     font-size: 28px;
   }
 }
+
+/* ============================================
+   Scroll Reveal Animations
+   ============================================ */
+.reveal {
+  --reveal-duration: 700ms;
+  --reveal-delay: 0ms;
+  --reveal-distance: 40px;
+  --reveal-easing: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  transition:
+    opacity var(--reveal-duration) var(--reveal-easing) var(--reveal-delay),
+    transform var(--reveal-duration) var(--reveal-easing) var(--reveal-delay);
+  will-change: opacity, transform;
+}
+
+.reveal-fade-up {
+  opacity: 0;
+  transform: translate3d(0, var(--reveal-distance), 0);
+}
+
+.reveal-fade-in {
+  opacity: 0;
+  transform: none;
+}
+
+.reveal-fade-left {
+  opacity: 0;
+  transform: translate3d(calc(-1 * var(--reveal-distance)), 0, 0);
+}
+
+.reveal-fade-right {
+  opacity: 0;
+  transform: translate3d(var(--reveal-distance), 0, 0);
+}
+
+.reveal-zoom-in {
+  opacity: 0;
+  transform: scale(0.92);
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* Reduced motion — disable all reveal transitions */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}

@@ -137,3 +137,41 @@
 .whatsapp-btn i {
   font-size: 18px;
 }
+
+.hours-highlight {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 24px 0 8px;
+}
+
+.hours-time {
+  font-family: 'Poppins', sans-serif;
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--color-accent);
+  letter-spacing: -1px;
+}
+
+.hours-sep {
+  font-size: 24px;
+  color: var(--color-text-muted);
+}
+
+.hours-days {
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+
+.hours-note {
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
