@@ -1,94 +1,44 @@
 <div class="wrapper flex-row wrapp-booking-form">
   <div class="booking-form">
-    <form [formGroup]="reservationForm" (ngSubmit)="submitForm()" novalidate>
-      <div class="wrapp-input-group">
-        <div class="field">
-          <label for="name">სახელი</label>
-          <input
-            id="name"
-            type="text"
-            formControlName="name"
-            placeholder="სახელი"
-            autocomplete="given-name"
-          />
-          <small class="error" *ngIf="isInvalid('name')">
-            აუცილებელია მინიმუმ 2 ასო (ქართული ან ლათინური).
-          </small>
-        </div>
+    <!-- ============================================ -->
+    <!-- SUCCESS STATE -->
+    <!-- ============================================ -->
+    <div *ngIf="showSuccess && successData" class="success-screen">
+      <div class="success-icon">
+        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+      </div>
 
-        <div class="field">
-          <label for="lastname">გვარი</label>
-          <input
-            id="lastname"
-            type="text"
-            formControlName="lastname"
-            placeholder="გვარი"
-            autocomplete="family-name"
-          />
-          <small class="error" *ngIf="isInvalid('lastname')">
-            აუცილებელია მინიმუმ 2 ასო (ქართული ან ლათინური).
-          </small>
-        </div>
+      <h3>ჯავშანი მიღებულია!</h3>
+      <p class="success-subtitle">ჩვენ მალე დაგიკავშირდებით დასადასტურებლად</p>
 
-        <div class="field">
-          <label for="phone">ტელეფონი</label>
-          <input
-            id="phone"
-            type="tel"
-            formControlName="phone"
-            placeholder="5XXXXXXXX"
-            autocomplete="tel"
-          />
-          <small class="error" *ngIf="isInvalid('phone')">
-            შეიყვანეთ 9 ციფრი.
-          </small>
+      <div class="success-summary">
+        <div class="summary-row">
+          <i class="fa-solid fa-calendar-day" aria-hidden="true"></i>
+          <span>{{ formatDateKa(successData.date) }}</span>
         </div>
-
-        <div class="field">
-          <label for="email">ელფოსტა</label>
-          <input
-            id="email"
-            type="email"
-            formControlName="email"
-            placeholder="you@example.com"
-            autocomplete="email"
-          />
-          <small class="error" *ngIf="isInvalid('email')">
-            შეიყვანეთ სწორი ელფოსტა.
-          </small>
+        <div class="summary-row">
+          <i class="fa-solid fa-clock" aria-hidden="true"></i>
+          <span>{{ successData.time }}</span>
         </div>
-
-        <div class="field">
-          <label for="date">თარიღი</label>
-          <input id="date" type="date" formControlName="date" />
-          <small class="error" *ngIf="isInvalid('date')">
-            აირჩიეთ მომავალი თარიღი.
-          </small>
+        <div class="summary-row">
+          <i class="fa-solid fa-users" aria-hidden="true"></i>
+          <span>{{ successData.guests }} სტუმარი</span>
         </div>
-
-        <div class="field">
-          <label for="time">საათი</label>
-          <input id="time" type="time" formControlName="time" />
-          <small class="error" *ngIf="isInvalid('time')">
-            შეიყვანეთ სწორი დრო (HH:mm).
-          </small>
+        <div class="summary-row">
+          <i class="fa-solid fa-user" aria-hidden="true"></i>
+          <span>{{ successData.name }} {{ successData.lastname }}</span>
+        </div>
+        <div class="summary-row">
+          <i class="fa-solid fa-phone" aria-hidden="true"></i>
+          <span>{{ successData.phone }}</span>
+        </div>
+        <div class="summary-row" *ngIf="successData.notes">
+          <i class="fa-solid fa-comment" aria-hidden="true"></i>
+          <span>{{ successData.notes }}</span>
         </div>
       </div>
 
-      <button type="submit" class="btn submit-btn" [disabled]="submitting">
-        {{ submitting ? 'იგზავნება…' : 'დადასტურება' }}
-      </button>
-
-      <div aria-live="polite" aria-atomic="true">
-        <p
-          class="result"
-          *ngIf="resultMessage"
-          [class.error]="resultIsError"
-          [class.success]="!resultIsError"
-        >
-          {{ resultMessage }}
-        </p>
-
+      <div class="success-actions">
         <a
           *ngIf="whatsappLink"
           class="btn whatsapp-btn"
@@ -99,29 +49,367 @@
           <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
           WhatsApp-ზე დადასტურება
         </a>
+
+        <button type="button" class="btn-outline" (click)="downloadCalendar()">
+          <i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>
+          კალენდარში დამატება
+        </button>
+
+        <button type="button" class="btn-outline" (click)="resetForm()">
+          <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+          ახალი ჯავშანი
+        </button>
       </div>
-    </form>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- FORM (WIZARD) -->
+    <!-- ============================================ -->
+    <div *ngIf="!showSuccess">
+      <!-- Progress + steps -->
+      <div class="wizard-header">
+        <div class="wizard-steps">
+          <button
+            type="button"
+            *ngFor="let step of steps; let i = index"
+            class="wizard-step"
+            [class.active]="i === currentStep()"
+            [class.completed]="i < currentStep()"
+            [class.clickable]="i <= currentStep()"
+            [disabled]="i > currentStep()"
+            (click)="goToStep(i)"
+          >
+            <span class="step-icon">
+              <i
+                class="fa-solid"
+                [ngClass]="i < currentStep() ? 'fa-check' : step.icon"
+                aria-hidden="true"
+              ></i>
+            </span>
+            <span class="step-label">{{ step.label }}</span>
+          </button>
+        </div>
+
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="progress"></div>
+        </div>
+      </div>
+
+      <form [formGroup]="reservationForm" (ngSubmit)="submitForm()" novalidate>
+        <!-- ============================================ -->
+        <!-- STEP 1: DATE, TIME, GUESTS -->
+        <!-- ============================================ -->
+        <div class="step-content" *ngIf="currentStep() === 0">
+          <!-- QUICK DATES -->
+          <div class="field">
+            <label>სწრაფი არჩევანი</label>
+            <div class="quick-picks">
+              <button
+                type="button"
+                *ngFor="let qd of quickDates"
+                class="quick-btn"
+                [class.active]="isQuickDateActive(qd.offset, qd.dayOfWeek)"
+                (click)="selectDate(qd.offset, qd.dayOfWeek)"
+              >
+                {{ qd.label }}
+              </button>
+            </div>
+          </div>
+
+          <div class="wrapp-input-group">
+            <div class="field">
+              <label for="date">თარიღი <span class="required">*</span></label>
+              <input
+                id="date"
+                type="date"
+                formControlName="date"
+                [min]="minDate"
+                [max]="maxDate"
+              />
+              <small class="error" *ngIf="isInvalid('date')">
+                აირჩიეთ მომავალი თარიღი (მაქსიმუმ 1 წლით წინ).
+              </small>
+            </div>
+
+            <div class="field">
+              <label for="time">საათი <span class="required">*</span></label>
+              <input
+                id="time"
+                type="time"
+                formControlName="time"
+                placeholder="19:00"
+                min="10:00"
+                max="23:59"
+              />
+
+              <!-- Working hours errors -->
+              <small class="error" *ngIf="hasError('time', 'beforeOpening')">
+                <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                რესტორანი იხსნება 10:00 საათზე.
+              </small>
+              <small class="error" *ngIf="hasError('time', 'afterClosing')">
+                <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                ბოლო ჯავშანი მიიღება 00:00 საათამდე (დაკეტვამდე 1 საათით ადრე).
+              </small>
+              <small
+                class="error"
+                *ngIf="
+                  isInvalid('time') &&
+                  !hasError('time', 'beforeOpening') &&
+                  !hasError('time', 'afterClosing')
+                "
+              >
+                შეიყვანეთ სწორი დრო (HH:mm).
+              </small>
+              <small class="hint" *ngIf="!isInvalid('time')">
+                სამუშაო საათები: 10:00 – 01:00 (ბოლო ჯავშანი 00:00-მდე)
+              </small>
+            </div>
+          </div>
+
+          <!-- QUICK TIMES -->
+          <div class="field">
+            <label>პოპულარული დრო</label>
+            <div class="quick-picks">
+              <button
+                type="button"
+                *ngFor="let t of quickTimes"
+                class="quick-btn"
+                [class.active]="reservationForm.get('time')?.value === t"
+                (click)="selectTime(t)"
+              >
+                {{ t }}
+              </button>
+            </div>
+          </div>
+
+          <!-- GUEST COUNTER -->
+          <div class="field">
+            <label>სტუმრების რაოდენობა <span class="required">*</span></label>
+            <div class="guest-counter">
+              <button
+                type="button"
+                class="counter-btn"
+                (click)="decrementGuests()"
+                [disabled]="guests <= minGuests"
+                aria-label="შემცირება"
+              >
+                <i class="fa-solid fa-minus" aria-hidden="true"></i>
+              </button>
+
+              <div class="counter-value">
+                <i class="fa-solid fa-users" aria-hidden="true"></i>
+                <span>{{ guests }}</span>
+                <small>{{ guests === 1 ? 'სტუმარი' : 'სტუმარი' }}</small>
+              </div>
+
+              <button
+                type="button"
+                class="counter-btn"
+                (click)="incrementGuests()"
+                [disabled]="guests >= maxGuests"
+                aria-label="გაზრდა"
+              >
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              </button>
+            </div>
+            <small class="hint">მაქსიმუმ {{ maxGuests }} სტუმარი ონლაინ</small>
+          </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- STEP 2: CONTACT -->
+        <!-- ============================================ -->
+        <div class="step-content" *ngIf="currentStep() === 1">
+          <div class="wrapp-input-group">
+            <div class="field">
+              <label for="name">სახელი <span class="required">*</span></label>
+              <input
+                id="name"
+                type="text"
+                formControlName="name"
+                placeholder="სახელი"
+                autocomplete="given-name"
+              />
+              <small class="error" *ngIf="isInvalid('name')">
+                მინიმუმ 2 ასო (ქართული ან ლათინური).
+              </small>
+            </div>
+
+            <div class="field">
+              <label for="lastname">გვარი <span class="required">*</span></label>
+              <input
+                id="lastname"
+                type="text"
+                formControlName="lastname"
+                placeholder="გვარი"
+                autocomplete="family-name"
+              />
+              <small class="error" *ngIf="isInvalid('lastname')">
+                მინიმუმ 2 ასო (ქართული ან ლათინური).
+              </small>
+            </div>
+
+            <div class="field">
+              <label for="phone">ტელეფონი <span class="required">*</span></label>
+              <input
+                id="phone"
+                type="tel"
+                formControlName="phone"
+                placeholder="5XX XXX XXX"
+                autocomplete="tel"
+              />
+              <small class="error" *ngIf="isInvalid('phone')">
+                ქართული ნომერი, 9 ციფრი, იწყება 5-ით (მაგ: 555 123 456).
+              </small>
+            </div>
+
+            <div class="field">
+              <label for="email">
+                ელფოსტა <small class="optional">(სურვილისამებრ)</small>
+              </label>
+              <input
+                id="email"
+                type="email"
+                formControlName="email"
+                placeholder="you@example.com"
+                autocomplete="email"
+              />
+              <small class="error" *ngIf="isInvalid('email')">
+                შეიყვანეთ სწორი ელფოსტა.
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- STEP 3: NOTES + VOICE -->
+        <!-- ============================================ -->
+        <div class="step-content" *ngIf="currentStep() === 2">
+          <div class="voice-section" *ngIf="voiceSupported()">
+            <button
+              type="button"
+              class="voice-btn"
+              [class.listening]="isListening()"
+              (click)="toggleVoice()"
+              [attr.aria-label]="isListening() ? 'შეჩერდი' : 'ხმით შევსება'"
+            >
+              <i
+                class="fa-solid"
+                [ngClass]="isListening() ? 'fa-microphone-slash' : 'fa-microphone'"
+                aria-hidden="true"
+              ></i>
+              <span>{{ isListening() ? 'ისმენს…' : 'ხმით შევსება' }}</span>
+            </button>
+            <small class="hint">
+              თქვი: "ორი სტუმარი ხვალ 19 საათზე"
+            </small>
+          </div>
+
+          <div class="field">
+            <label for="notes">
+              სპეციალური სურვილები
+              <small class="optional">(სურვილისამებრ)</small>
+            </label>
+            <textarea
+              id="notes"
+              formControlName="notes"
+              rows="4"
+              placeholder="მაგ: ფანჯარასთან მაგიდა, დაბადების დღე, ბავშვის სკამი…"
+              maxlength="300"
+            ></textarea>
+            <small class="hint">
+              {{ reservationForm.get('notes')?.value?.length || 0 }} / 300 სიმბოლო
+            </small>
+          </div>
+
+          <div class="booking-preview" *ngIf="reservationForm.get('date')?.value">
+            <h4>ჯავშნის შეჯამება</h4>
+            <div class="summary-row">
+              <i class="fa-solid fa-calendar-day" aria-hidden="true"></i>
+              <span>{{ formatDateKa(reservationForm.get('date')?.value || '') }}</span>
+            </div>
+            <div class="summary-row">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              <span>{{ reservationForm.get('time')?.value || '—' }}</span>
+            </div>
+            <div class="summary-row">
+              <i class="fa-solid fa-users" aria-hidden="true"></i>
+              <span>{{ guests }} სტუმარი</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- WIZARD NAV -->
+        <!-- ============================================ -->
+        <div class="wizard-nav">
+          <button
+            type="button"
+            class="btn-outline"
+            *ngIf="!isFirstStep"
+            (click)="prevStep()"
+          >
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+            უკან
+          </button>
+
+          <button
+            type="button"
+            class="btn"
+            (click)="nextStep()"
+            [disabled]="submitting || !currentStepValid"
+          >
+            <span *ngIf="!submitting">
+              {{ isLastStep ? 'დადასტურება' : 'შემდეგი' }}
+              <i
+                class="fa-solid"
+                [ngClass]="isLastStep ? 'fa-check' : 'fa-arrow-right'"
+                aria-hidden="true"
+              ></i>
+            </span>
+            <span *ngIf="submitting">
+              <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
+              იგზავნება…
+            </span>
+          </button>
+        </div>
+
+        <div aria-live="polite" aria-atomic="true">
+          <p
+            class="result"
+            *ngIf="resultMessage"
+            [class.error]="resultIsError"
+            [class.success]="!resultIsError"
+          >
+            {{ resultMessage }}
+          </p>
+        </div>
+      </form>
+    </div>
   </div>
 
+  <!-- ============================================ -->
+  <!-- WORKING HOURS -->
+  <!-- ============================================ -->
   <aside class="working-hours">
-  <h3>სამუშაო საათები</h3>
-  <p>
-    გვეწვიეთ ჩვენს მყუდრო სივრცეში. განიცადეთ ჩვენი კულინარიული ვნება და
-    უნიკალური ატმოსფერო. ჩვენ მოუთმენლად ველით თქვენთან შეხვედრას!
-  </p>
+    <h3>სამუშაო საათები</h3>
+    <p>
+      გვეწვიეთ ჩვენს მყუდრო სივრცეში. განიცადეთ ჩვენი კულინარიული ვნება და
+      უნიკალური ატმოსფერო. ჩვენ მოუთმენლად ველით თქვენთან შეხვედრას!
+    </p>
 
-  <div class="hours-highlight">
-    <span class="hours-time">10:00</span>
-    <span class="hours-sep">—</span>
-    <span class="hours-time">01:00</span>
-  </div>
+    <div class="hours-highlight">
+      <span class="hours-time">10:00</span>
+      <span class="hours-sep">—</span>
+      <span class="hours-time">01:00</span>
+    </div>
 
-  <p class="hours-days">
-    ორშაბათი — კვირა
-  </p>
+    <p class="hours-days">ორშაბათი — კვირა</p>
 
-  <p class="hours-note">
-    ყოველდღე ღიაა
-  </p>
-</aside>
+    <p class="hours-note">
+      <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+      ყოველდღე ღიაა · ბოლო ჯავშანი 00:00
+    </p>
+  </aside>
 </div>
