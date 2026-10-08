@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 export interface BookingRequest {
   name: string;
@@ -14,14 +15,8 @@ export interface BookingRequest {
 
 @Injectable({ providedIn: 'root' })
 export class BookingService {
-  private http = inject(HttpClient);
-
-  /**
-   * Set this to your real endpoint.
-   * Easiest option — Formspree (free): https://formspree.io
-   * Paste your endpoint here, e.g. 'https://formspree.io/f/xyzabc'
-   */
-  private endpoint = 'REPLACE_WITH_YOUR_ENDPOINT';
+  private readonly http = inject(HttpClient);
+  private readonly endpoint = environment.bookingEndpoint;
 
   submit(data: BookingRequest): Observable<unknown> {
     if (this.endpoint === 'REPLACE_WITH_YOUR_ENDPOINT') {

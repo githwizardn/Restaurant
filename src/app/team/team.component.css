@@ -5,10 +5,20 @@
 
 .chefs-item {
   width: calc(25% - 15px);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 4px;
   overflow: hidden;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease,
+    background-color 0.3s ease, border-color 0.3s ease;
+}
+
+[data-theme="light"] .chefs-item {
+  box-shadow: var(--color-shadow);
+}
+
+[data-theme="light"] .chefs-item:hover {
+  box-shadow: var(--color-shadow-strong);
 }
 
 .chefs-item:hover {

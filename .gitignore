@@ -1,13 +1,41 @@
-# Dependencies
+# ===== Dependencies =====
 /node_modules
+/.pnp
+.pnp.js
 
-# Angular cache and build output
-/.angular
+# ===== Build outputs =====
 /dist
-/tmp
+/out-tsc
+/bazel-out
 
-# IDE / System files
-/.vscode
-/.idea
+# ===== Angular =====
+.angular/
+.cache/
+
+# ===== IDE & Editor =====
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# ===== OS =====
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# ===== Logs =====
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# ===== Env files (local secrets) =====
+.env
+.env.local
+.env.*.local
+
+# ===== Tests =====
+/coverage

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://angular-beta-eight-80.vercel.app/sitemap.xml

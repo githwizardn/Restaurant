@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ScrollService } from '../services/scroll.service';
+import { ThemeService } from '../services/theme.service';
 
 interface NavItem {
   label: string;
@@ -25,8 +26,10 @@ interface NavItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavbarComponent implements AfterViewInit, OnDestroy {
-  private scrollService = inject(ScrollService);
-  private cdr = inject(ChangeDetectorRef);
+  private readonly scrollService = inject(ScrollService);
+  private readonly cdr = inject(ChangeDetectorRef);
+  readonly themeService = inject(ThemeService);
+
   private observer?: IntersectionObserver;
 
   menuItems: NavItem[] = [
@@ -92,5 +95,13 @@ export class NavbarComponent implements AfterViewInit, OnDestroy {
 
   toggleMobileMenu(): void {
     this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggle();
+  }
+
+  get isLightTheme(): boolean {
+    return this.themeService.theme() === 'light';
   }
 }
