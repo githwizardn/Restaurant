@@ -2,26 +2,26 @@
 
 A modern, production-ready restaurant website built with **Angular 16** — featuring PWA support, SEO optimization, dark/light theme, and a fully responsive design.
 
-🌐 **Live Demo:** [angular-beta-eight-80.vercel.app](https://angular-beta-eight-80.vercel.app/)
+ **Live Demo:** [angular-beta-eight-80.vercel.app](https://angular-beta-eight-80.vercel.app/)
 
 ---
 
-## ✨ Features
+##  Features
 
-- 🎨 **Modern Angular 16** — Standalone components, signals, `OnPush` change detection
-- 📱 **PWA (Progressive Web App)** — Offline support, installable on mobile
-- 🌓 **Dark / Light Theme** — Persisted preference, system detection
-- 🔍 **SEO Optimized** — Meta tags, Open Graph, Twitter Cards, JSON-LD structured data
-- ♿ **Accessible** — ARIA labels, skip links, keyboard navigation
-- 📝 **Booking Form** — Reactive Forms with custom validators
-- 🍔 **66-Item Menu** — Filterable by category (burgers, sides, drinks, desserts)
-- 🎠 **Custom Carousel** — Auto-play, pause-on-hover, responsive
-- 📊 **Performance** — Lazy images, optimized bundle (~604 KB gzipped)
-- 🌍 **Responsive** — Mobile-first design, tested on all breakpoints
+-  **Modern Angular 16** — Standalone components, signals, `OnPush` change detection
+-  **PWA (Progressive Web App)** — Offline support, installable on mobile
+-  **Dark / Light Theme** — Persisted preference, system detection
+-  **SEO Optimized** — Meta tags, Open Graph, Twitter Cards, JSON-LD structured data
+-  **Accessible** — ARIA labels, skip links, keyboard navigation
+-  **Booking Form** — Reactive Forms with custom validators
+-  **66-Item Menu** — Filterable by category (burgers, sides, drinks, desserts)
+-  **Custom Carousel** — Auto-play, pause-on-hover, responsive
+-  **Performance** — Lazy images, optimized bundle (~604 KB gzipped)
+- **Responsive** — Mobile-first design, tested on all breakpoints
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 | Category | Technology |
 |----------|-----------|
@@ -36,7 +36,7 @@ A modern, production-ready restaurant website built with **Angular 16** — feat
 
 ---
 
-## 📦 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -61,7 +61,7 @@ Open **http://localhost:4200** in your browser.
 
 ---
 
-## 🏗️ Available Scripts
+##  Available Scripts
 
 | Command | Description |
 |---------|-------------|
@@ -80,7 +80,7 @@ ng build --configuration production
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 src/
@@ -113,7 +113,7 @@ src/
 
 ---
 
-## 🎨 Theme System
+##  Theme System
 
 The app uses **CSS variables** for theming. Switch between dark and light mode with the toggle in the navbar.
 
@@ -135,7 +135,7 @@ Theme preference is saved to `localStorage` and falls back to system preference.
 
 ---
 
-## 📱 PWA Features
+##  PWA Features
 
 - **Installable** — Add to home screen on mobile
 - **Offline-ready** — Service Worker caches app shell and images
@@ -154,11 +154,11 @@ npx http-server -p 8080
 
 Open **http://127.0.0.1:8080** — Service Worker activates automatically.
 
-> ⚠️ PWA works on `localhost` and `https://` only. LAN IP (e.g., `192.168.x.x`) won't work.
+>  PWA works on `localhost` and `https://` only. LAN IP (e.g., `192.168.x.x`) won't work.
 
 ---
 
-## 🚀 Deployment
+##  Deployment
 
 ### Vercel (Recommended)
 
@@ -183,7 +183,7 @@ The project is optimized for **Vercel** — zero configuration required.
 
 ---
 
-## 🔧 Configuration
+##  Configuration
 
 ### Environment Variables
 
@@ -211,7 +211,7 @@ Currently in **demo mode** (no real submission). To enable real bookings:
 
 ---
 
-## 🧪 Testing
+##  Testing
 
 ```bash
 # Unit tests
@@ -223,26 +223,26 @@ ng test --code-coverage
 
 ---
 
-## 📝 License
+##  License
 
 This project is licensed under the **MIT License** — see [LICENSE](LICENSE) for details.
 
 ---
 
-## 👤 Author
+##  Author
 
 
 - GitHub: [@githwizardn](https://github.com/githwizardn)
 
 ---
 
-## ⚠️ Disclaimer
+##  Disclaimer
 
 This is a **portfolio / educational project**. Not affiliated with any real restaurant business. Images used are from [Unsplash](https://unsplash.com) and the original [burgerlions.com](https://burgerlions.com) website for demonstration purposes only.
 
 ---
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - [Unsplash](https://unsplash.com) — free stock photos
 - [Angular](https://angular.dev) — framework
@@ -254,7 +254,5 @@ This is a **portfolio / educational project**. Not affiliated with any real rest
 <div align="center">
 
 **Built with ❤️ using Angular 16**
-
-⭐ Star this repo if you found it helpful!
 
 </div>
